@@ -16,7 +16,7 @@ Follow these steps to add the Oxia Helm repository and install a release.
 1.  **Add the Helm repository:**
 
     ```bash
-    helm repo add oxia https://raw.githubusercontent.com/oxia-db/helm-charts/gh-pages
+    helm repo add oxia https://oxia-db.github.io/helm-charts/
     helm repo update
     ```
 
