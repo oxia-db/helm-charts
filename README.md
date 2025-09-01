@@ -6,7 +6,7 @@ This repository contains the official Helm charts for deploying [Oxia](https://g
 
 Before you begin, ensure you have the following installed:
 
-* A **Kubernetes cluster** 
+* **Kubernetes cluster** 
 * **Helm**
 
 ## Quick Start
@@ -16,7 +16,7 @@ Follow these steps to add the Oxia Helm repository and install a release.
 1.  **Add the Helm repository:**
 
     ```bash
-    helm repo add oxia-db https://oxia-db.github.io/helm-charts
+    helm repo add oxia https://raw.githubusercontent.com/oxia-db/helm-charts/gh-pages
     helm repo update
     ```
 
@@ -25,7 +25,7 @@ Follow these steps to add the Oxia Helm repository and install a release.
     You can deploy Oxia with a simple `helm install` command. This will create a release named `my-release` in your current namespace.
 
     ```bash
-    helm install my-release oxia-db/oxia
+    helm install my-release oxia/oxia-cluster
     ```
 
 ## Configuration
