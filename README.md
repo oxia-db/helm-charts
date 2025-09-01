@@ -41,4 +41,4 @@ To see all available configuration options, refer to the `values.yaml` file in t
 To install a specific version and provide custom values, use the `--version` flag and the `-f` flag.
 
 ```bash
-helm install my-release oxia-db/oxia --version 0.1.0 -f values.yaml
+helm install my-release oxia/oxia-cluster --version 0.1.0 -f values.yaml
