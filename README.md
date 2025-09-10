@@ -33,12 +33,3 @@ Follow these steps to add the Oxia Helm repository and install a release.
 You can customize your deployment by using the `--set` flag or by providing a custom `values.yaml` file.
 
 To see all available configuration options, refer to the `values.yaml` file in the chart's repository.
-
----
-
-### Example: Customizing the Release
-
-To install a specific version and provide custom values, use the `--version` flag and the `-f` flag.
-
-```bash
-helm install my-release oxia/oxia-cluster --version 0.1.0 -f values.yaml
