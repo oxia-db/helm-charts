@@ -56,6 +56,9 @@ spec:
               name: {{ $key }}
             {{- end}}
           resources:
+            requests:
+              cpu: {{ .Values.server.cpu }}
+              memory: {{ .Values.server.memory }}
             limits:
               cpu: {{ .Values.server.cpu }}
               memory: {{ .Values.server.memory }}
