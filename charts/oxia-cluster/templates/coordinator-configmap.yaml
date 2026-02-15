@@ -22,19 +22,9 @@ data:
   coordinator.yaml: |
     cluster:
       configPath: "/oxia/conf/cluster/config.yaml"
-    server:
-      admin:
-        bindAddress: "0.0.0.0:{{ .Values.coordinator.ports.internal }}"
-      internal:
-        bindAddress: "0.0.0.0:{{ .Values.coordinator.ports.internal }}"
     metadata:
       providerName: "configmap"
       kubernetes:
         namespace: {{ .Release.Namespace | quote }}
         configMapName: {{ .Release.Name }}-status
-    observability:
-      metric:
-        enabled: true
-        bindAddress: "0.0.0.0:{{ .Values.coordinator.ports.metrics }}"
-      log:
-        level: {{ .Values.coordinator.logLevel | quote }}
+    {{- .Values.coordinator.config | toYaml | nindent 4 }}

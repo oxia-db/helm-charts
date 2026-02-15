@@ -31,10 +31,18 @@ replicationFactor: 3
 coordinator:
   cpu: 100m
   memory: 128Mi
-  ports:
-    internal: 6650
-    metrics: 8081
-  logLevel: info
+  config:
+    server:
+      admin:
+        bindAddress: "0.0.0.0:6650"
+      internal:
+        bindAddress: "0.0.0.0:6650"
+    observability:
+      metric:
+        enabled: true
+        bindAddress: "0.0.0.0:8081"
+      log:
+        level: "info"
 
 server:
   replicas: 3
@@ -42,30 +50,42 @@ server:
   memory: 1Gi
   storage: 8Gi
   #storageClassName: xxx
-  dbCacheSizeMb: 512
-  walRetentionTime: 1h
-  walSyncData: true
-  notificationsRetentionTime: 1h
-  logLevel: info
-  ports:
-    public: 6648
-    internal: 6649
-    metrics: 8080
-  # TLS configuration for public endpoint
-  #tls:
-  #  certFile: /etc/oxia/tls/tls.crt
-  #  keyFile: /etc/oxia/tls/tls.key
-  #  trustedCaFile: /etc/oxia/tls/ca.crt
-  # TLS configuration for internal endpoint
-  #internalTls:
-  #  certFile: /etc/oxia/tls/tls.crt
-  #  keyFile: /etc/oxia/tls/tls.key
-  #  trustedCaFile: /etc/oxia/tls/ca.crt
-  # TLS configuration for replication (peer)
-  #peerTls:
-  #  certFile: /etc/oxia/tls/tls.crt
-  #  keyFile: /etc/oxia/tls/tls.key
-  #  trustedCaFile: /etc/oxia/tls/ca.crt
+  config:
+    server:
+      public:
+        bindAddress: "0.0.0.0:6648"
+      internal:
+        bindAddress: "0.0.0.0:6649"
+    # TLS can be configured directly under server endpoints:
+    #   public:
+    #     tls:
+    #       enabled: true
+    #       certFile: /etc/oxia/tls/tls.crt
+    #       keyFile: /etc/oxia/tls/tls.key
+    #       trustedCaFile: /etc/oxia/tls/ca.crt
+    # Replication TLS:
+    # replication:
+    #   tls:
+    #     enabled: true
+    #     certFile: /etc/oxia/tls/tls.crt
+    #     keyFile: /etc/oxia/tls/tls.key
+    #     trustedCaFile: /etc/oxia/tls/ca.crt
+    storage:
+      wal:
+        dir: "/data/wal"
+        sync: true
+        retention: "1h"
+      database:
+        dir: "/data/db"
+        readCacheSizeMB: 512
+      notification:
+        retention: "1h"
+    observability:
+      metric:
+        enabled: true
+        bindAddress: "0.0.0.0:8080"
+      log:
+        level: "info"
 
 image:
   repository: oxia/oxia

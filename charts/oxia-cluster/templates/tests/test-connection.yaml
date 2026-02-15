@@ -11,4 +11,4 @@ spec:
   containers:
     - name: oxia-health
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-      command: ["oxia", "health", "--port={{ .Values.server.ports.internal }}", "--addr={{ .Release.Name }}-svc"]
+      command: ["oxia", "health", "--port={{ include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress }}", "--addr={{ .Release.Name }}-svc"]

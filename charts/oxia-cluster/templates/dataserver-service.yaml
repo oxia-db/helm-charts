@@ -23,16 +23,20 @@ spec:
   clusterIP: None
   publishNotReadyAddresses: true
   ports:
-    {{- range $key, $value := .Values.server.ports }}
-    - name: {{ $key }}
-      port: {{ $value }}
-      targetPort: {{ $key }}
-    {{- end}}
+    - name: public
+      port: {{ include "oxia-cluster.port" .Values.server.config.server.public.bindAddress | int }}
+      targetPort: public
+    - name: internal
+      port: {{ include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress | int }}
+      targetPort: internal
+    - name: metrics
+      port: {{ include "oxia-cluster.port" .Values.server.config.observability.metric.bindAddress | int }}
+      targetPort: metrics
     - name: coord-internal
-      port: {{ .Values.coordinator.ports.internal }}
+      port: {{ include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress | int }}
       targetPort: coord-internal
     - name: coord-metrics
-      port: {{ .Values.coordinator.ports.metrics }}
+      port: {{ include "oxia-cluster.port" .Values.coordinator.config.observability.metric.bindAddress | int }}
       targetPort: coord-metrics
   selector:
     {{- include "oxia-cluster.server.selectorLabels" . | nindent 4 }}

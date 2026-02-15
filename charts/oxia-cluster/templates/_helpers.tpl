@@ -50,6 +50,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Extract port number from bind address (e.g., "0.0.0.0:6648" -> "6648")
+*/}}
+{{- define "oxia-cluster.port" -}}
+{{- (splitList ":" .) | last -}}
+{{- end -}}
+
+{{/*
 Probe
 */}}
 {{- define "oxia-cluster.probe" -}}

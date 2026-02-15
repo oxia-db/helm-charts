@@ -28,7 +28,7 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: "{{ .Values.server.ports.metrics }}"
+        prometheus.io/port: "{{ include "oxia-cluster.port" .Values.server.config.observability.metric.bindAddress }}"
         prometheus.io/scrape: "{{ .Values.monitoringEnabled }}"
       labels:
         oxia_cluster: {{ .Release.Name }}
@@ -37,7 +37,6 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}
       securityContext:
-        runAsNonRoot: true
         fsGroup: 10001
       containers:
         - command:
@@ -56,10 +55,12 @@ spec:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
           ports:
-            {{- range $key, $value := .Values.server.ports }}
-            - containerPort: {{ $value | int }}
-              name: {{ $key }}
-            {{- end}}
+            - containerPort: {{ include "oxia-cluster.port" .Values.server.config.server.public.bindAddress | int }}
+              name: public
+            - containerPort: {{ include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress | int }}
+              name: internal
+            - containerPort: {{ include "oxia-cluster.port" .Values.server.config.observability.metric.bindAddress | int }}
+              name: metrics
           resources:
             requests:
               cpu: {{ .Values.server.cpu }}
@@ -74,11 +75,11 @@ spec:
               mountPath: /oxia/conf
               readOnly: true
           livenessProbe:
-            {{- include "oxia-cluster.probe" .Values.server.ports.internal | nindent 12 }}
+            {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress) | nindent 12 }}
           readinessProbe:
-            {{- include "oxia-cluster.readiness-probe" .Values.server.ports.internal | nindent 12 }}
+            {{- include "oxia-cluster.readiness-probe" (include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress) | nindent 12 }}
           startupProbe:
-            {{- include "oxia-cluster.startup-probe" .Values.server.ports.internal | nindent 12 }}
+            {{- include "oxia-cluster.startup-probe" (include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress) | nindent 12 }}
         - command:
             - "oxia"
             - "coordinator"
@@ -95,9 +96,9 @@ spec:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
           ports:
-            - containerPort: {{ .Values.coordinator.ports.internal | int }}
+            - containerPort: {{ include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress | int }}
               name: coord-internal
-            - containerPort: {{ .Values.coordinator.ports.metrics | int }}
+            - containerPort: {{ include "oxia-cluster.port" .Values.coordinator.config.observability.metric.bindAddress | int }}
               name: coord-metrics
           resources:
             requests:
@@ -114,9 +115,9 @@ spec:
               mountPath: /oxia/conf/cluster
               readOnly: true
           livenessProbe:
-            {{- include "oxia-cluster.probe" .Values.coordinator.ports.internal | nindent 12 }}
+            {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress) | nindent 12 }}
           readinessProbe:
-            {{- include "oxia-cluster.probe" .Values.coordinator.ports.internal | nindent 12 }}
+            {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress) | nindent 12 }}
       volumes:
         - name: server-config
           configMap:

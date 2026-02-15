@@ -13,10 +13,10 @@ Namespace: default (shards: {{ .Values.initialShardCount }}, replication: {{ .Va
 To connect to the cluster:
 
   Public endpoint:
-    {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.server.ports.public }}
+    {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ include "oxia-cluster.port" .Values.server.config.server.public.bindAddress }}
 
   Coordinator endpoint:
-    {{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.coordinator.ports.internal }}
+    {{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress }}
 
 To verify the cluster is running:
 
