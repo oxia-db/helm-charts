@@ -23,8 +23,8 @@ coordinator:
   cpu: 100m
   memory: 128Mi
   ports:
-    internal: 6649
-    metrics: 8080
+    internal: 6650
+    metrics: 8081
 
 server:
   replicas: 3

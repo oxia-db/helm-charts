@@ -71,6 +71,37 @@ spec:
             {{- include "oxia-cluster.readiness-probe" .Values.server.ports.internal | nindent 12 }}
           startupProbe:
             {{- include "oxia-cluster.startup-probe" .Values.server.ports.internal | nindent 12 }}
+        - command:
+            - "oxia"
+            - "coordinator"
+            - "--conf=configmap:{{ .Release.Namespace }}/{{ .Release.Name }}-coordinator"
+            - "--log-json"
+            - "--metadata=configmap"
+            - "--k8s-namespace={{ .Release.Namespace }}"
+            - "--k8s-configmap-name={{ .Release.Name }}-status"
+            - "--internal-service-port={{ .Values.coordinator.ports.internal }}"
+            {{- if .Values.pprofEnabled }}
+            - "--profile"
+            {{- end}}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: coordinator
+          ports:
+            - containerPort: {{ .Values.coordinator.ports.internal | int }}
+              name: coord-internal
+            - containerPort: {{ .Values.coordinator.ports.metrics | int }}
+              name: coord-metrics
+          resources:
+            requests:
+              cpu: {{ .Values.coordinator.cpu }}
+              memory: {{ .Values.coordinator.memory }}
+            limits:
+              cpu: {{ .Values.coordinator.cpu }}
+              memory: {{ .Values.coordinator.memory }}
+          livenessProbe:
+            {{- include "oxia-cluster.probe" .Values.coordinator.ports.internal | nindent 12 }}
+          readinessProbe:
+            {{- include "oxia-cluster.probe" .Values.coordinator.ports.internal | nindent 12 }}
   volumeClaimTemplates:
     - metadata:
         name: data

@@ -28,5 +28,11 @@ spec:
       port: {{ $value }}
       targetPort: {{ $key }}
     {{- end}}
+    - name: coord-internal
+      port: {{ .Values.coordinator.ports.internal }}
+      targetPort: coord-internal
+    - name: coord-metrics
+      port: {{ .Values.coordinator.ports.metrics }}
+      targetPort: coord-metrics
   selector:
     {{- include "oxia-cluster.server.selectorLabels" . | nindent 4 }}

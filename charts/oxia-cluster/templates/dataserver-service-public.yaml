@@ -12,20 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{- if .Values.monitoringEnabled }}
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+apiVersion: v1
+kind: Service
 metadata:
   labels:
-    {{- include "oxia-cluster.coordinator.labels" . | nindent 4 }}
-  name: {{ .Release.Name }}-coordinator
+    oxia_cluster: {{ .Release.Name }}
+    {{- include "oxia-cluster.server.labels" . | nindent 4 }}
+  name: {{ .Release.Name }}
 spec:
-  endpoints:
-    - path: "/metrics"
-      port: "{{ .Values.coordinator.ports.metrics }}"
+  ports:
+    {{- range $key, $value := .Values.server.ports }}
+    - name: {{ $key }}
+      port: {{ $value }}
+      targetPort: {{ $key }}
+    {{- end}}
+    - name: coord-internal
+      port: {{ .Values.coordinator.ports.internal }}
+      targetPort: coord-internal
+    - name: coord-metrics
+      port: {{ .Values.coordinator.ports.metrics }}
+      targetPort: coord-metrics
   selector:
-    matchLabels:
-      {{- include "oxia-cluster.coordinator.selectorLabels" . | nindent 6 }}
-  targetLabels:
-    - oxia_cluster
-{{- end }}
+    {{- include "oxia-cluster.server.selectorLabels" . | nindent 4 }}

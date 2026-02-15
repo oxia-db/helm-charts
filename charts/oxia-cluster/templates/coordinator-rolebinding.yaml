@@ -20,7 +20,7 @@ metadata:
   name: {{ .Release.Name }}-coordinator
 subjects:
   - kind: ServiceAccount
-    name: {{ .Release.Name }}-coordinator
+    name: {{ .Release.Name }}
     namespace: {{ .Release.Namespace }}
 roleRef:
   apiGroup: ""
