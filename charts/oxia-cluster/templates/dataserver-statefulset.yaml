@@ -82,8 +82,8 @@ spec:
         - command:
             - "oxia"
             - "coordinator"
-            - "--sconfig=/oxia/conf/coordinator.yaml"
-            - "--cconfig=/oxia/conf/cluster.yaml"
+            - "--sconfig=/oxia/conf/coordinator/coordinator.yaml"
+            - "--cconfig=/oxia/conf/cluster/cluster.yaml"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
@@ -109,7 +109,10 @@ spec:
               memory: {{ .Values.coordinator.memory }}
           volumeMounts:
             - name: coordinator-config
-              mountPath: /oxia/conf
+              mountPath: /oxia/conf/coordinator
+              readOnly: true
+            - name: cluster-config
+              mountPath: /oxia/conf/cluster
               readOnly: true
           livenessProbe:
             {{- include "oxia-cluster.probe" .Values.coordinator.ports.internal | nindent 12 }}
@@ -122,6 +125,9 @@ spec:
         - name: coordinator-config
           configMap:
             name: {{ .Release.Name }}-coordinator
+        - name: cluster-config
+          configMap:
+            name: {{ .Release.Name }}-cluster
   volumeClaimTemplates:
     - metadata:
         name: data
