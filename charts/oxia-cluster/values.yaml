@@ -34,7 +34,7 @@ coordinator:
   config:
     server:
       admin:
-        bindAddress: "0.0.0.0:6650"
+        bindAddress: "0.0.0.0:6651"
       internal:
         bindAddress: "0.0.0.0:6650"
     observability:
