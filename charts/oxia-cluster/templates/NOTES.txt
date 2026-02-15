@@ -1,0 +1,23 @@
+Oxia cluster "{{ .Release.Name }}" has been deployed in namespace "{{ .Release.Namespace }}".
+
+Server replicas: {{ .Values.server.replicas }}
+{{- if .Values.namespaces }}
+Namespaces:
+{{- range .Values.namespaces }}
+  - {{ .name }} (shards: {{ .initialShardCount }}, replication: {{ .replicationFactor }})
+{{- end }}
+{{- else }}
+Namespace: default (shards: {{ .Values.initialShardCount }}, replication: {{ .Values.replicationFactor }})
+{{- end }}
+
+To connect to the cluster:
+
+  Public endpoint:
+    {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.server.ports.public }}
+
+  Coordinator endpoint:
+    {{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.coordinator.ports.internal }}
+
+To verify the cluster is running:
+
+  kubectl get pods -l app.kubernetes.io/instance={{ .Release.Name }} -n {{ .Release.Namespace }}
