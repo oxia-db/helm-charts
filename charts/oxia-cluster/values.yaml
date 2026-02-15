@@ -34,6 +34,7 @@ coordinator:
   ports:
     internal: 6650
     metrics: 8081
+  logLevel: info
 
 server:
   replicas: 3
@@ -41,10 +42,30 @@ server:
   memory: 1Gi
   storage: 8Gi
   #storageClassName: xxx
+  dbCacheSizeMb: 512
+  walRetentionTime: 1h
+  walSyncData: true
+  notificationsRetentionTime: 1h
+  logLevel: info
   ports:
     public: 6648
     internal: 6649
     metrics: 8080
+  # TLS configuration for public endpoint
+  #tls:
+  #  certFile: /etc/oxia/tls/tls.crt
+  #  keyFile: /etc/oxia/tls/tls.key
+  #  trustedCaFile: /etc/oxia/tls/ca.crt
+  # TLS configuration for internal endpoint
+  #internalTls:
+  #  certFile: /etc/oxia/tls/tls.crt
+  #  keyFile: /etc/oxia/tls/tls.key
+  #  trustedCaFile: /etc/oxia/tls/ca.crt
+  # TLS configuration for replication (peer)
+  #peerTls:
+  #  certFile: /etc/oxia/tls/tls.crt
+  #  keyFile: /etc/oxia/tls/tls.key
+  #  trustedCaFile: /etc/oxia/tls/ca.crt
 
 image:
   repository: oxia/oxia

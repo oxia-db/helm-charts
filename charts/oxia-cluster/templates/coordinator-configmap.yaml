@@ -19,7 +19,7 @@ metadata:
     {{- include "oxia-cluster.coordinator.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-coordinator
 data:
-  config.yaml: |
+  cluster.yaml: |
     namespaces:
       {{- if .Values.namespaces }}
       {{- range .Values.namespaces }}
@@ -38,3 +38,22 @@ data:
       - public: {{ $vars.name }}-{{ . }}.{{ $vars.name }}-svc.{{ $vars.namespace }}.svc.cluster.local:{{ $vars.public }}
         internal: {{ $vars.name }}-{{ . }}.{{ $vars.name }}-svc:{{ $vars.internal }}
       {{- end }}
+  coordinator.yaml: |
+    cluster:
+      configPath: "/oxia/conf/cluster.yaml"
+    server:
+      admin:
+        bindAddress: "0.0.0.0:{{ .Values.coordinator.ports.internal }}"
+      internal:
+        bindAddress: "0.0.0.0:{{ .Values.coordinator.ports.internal }}"
+    metadata:
+      providerName: "configmap"
+      kubernetes:
+        namespace: {{ .Release.Namespace | quote }}
+        configMapName: {{ .Release.Name }}-status
+    observability:
+      metric:
+        enabled: true
+        bindAddress: "0.0.0.0:{{ .Values.coordinator.ports.metrics }}"
+      log:
+        level: {{ .Values.coordinator.logLevel | quote }}

@@ -40,10 +40,7 @@ spec:
         - command:
             - "oxia"
             - "server"
-            - "--log-json"
-            - "--data-dir=/data/db"
-            - "--wal-dir=/data/wal"
-            - "--db-cache-size-mb=512"
+            - "--sconfig=/oxia/conf/dataserver.yaml"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
@@ -65,6 +62,9 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: server-config
+              mountPath: /oxia/conf
+              readOnly: true
           livenessProbe:
             {{- include "oxia-cluster.probe" .Values.server.ports.internal | nindent 12 }}
           readinessProbe:
@@ -74,12 +74,8 @@ spec:
         - command:
             - "oxia"
             - "coordinator"
-            - "--conf=configmap:{{ .Release.Namespace }}/{{ .Release.Name }}-coordinator"
-            - "--log-json"
-            - "--metadata=configmap"
-            - "--k8s-namespace={{ .Release.Namespace }}"
-            - "--k8s-configmap-name={{ .Release.Name }}-status"
-            - "--internal-service-port={{ .Values.coordinator.ports.internal }}"
+            - "--sconfig=/oxia/conf/coordinator.yaml"
+            - "--cconfig=/oxia/conf/cluster.yaml"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
@@ -98,10 +94,21 @@ spec:
             limits:
               cpu: {{ .Values.coordinator.cpu }}
               memory: {{ .Values.coordinator.memory }}
+          volumeMounts:
+            - name: coordinator-config
+              mountPath: /oxia/conf
+              readOnly: true
           livenessProbe:
             {{- include "oxia-cluster.probe" .Values.coordinator.ports.internal | nindent 12 }}
           readinessProbe:
             {{- include "oxia-cluster.probe" .Values.coordinator.ports.internal | nindent 12 }}
+      volumes:
+        - name: server-config
+          configMap:
+            name: {{ .Release.Name }}-server
+        - name: coordinator-config
+          configMap:
+            name: {{ .Release.Name }}-coordinator
   volumeClaimTemplates:
     - metadata:
         name: data
