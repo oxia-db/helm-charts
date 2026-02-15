@@ -19,7 +19,7 @@ metadata:
     {{- include "oxia-cluster.server.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-cluster
 data:
-  cluster.yaml: |
+  config.yaml: |
     namespaces:
       {{- if .Values.namespaces }}
       {{- range .Values.namespaces }}

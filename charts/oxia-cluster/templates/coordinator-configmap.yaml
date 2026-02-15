@@ -21,7 +21,7 @@ metadata:
 data:
   coordinator.yaml: |
     cluster:
-      configPath: "/oxia/conf/cluster/cluster.yaml"
+      configPath: "/oxia/conf/cluster/config.yaml"
     server:
       admin:
         bindAddress: "0.0.0.0:{{ .Values.coordinator.ports.internal }}"
