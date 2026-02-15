@@ -19,6 +19,15 @@
 initialShardCount: 3
 replicationFactor: 3
 
+# For multiple namespaces, use:
+# namespaces:
+#   - name: default
+#     initialShardCount: 3
+#     replicationFactor: 3
+#   - name: my-namespace
+#     initialShardCount: 1
+#     replicationFactor: 3
+
 coordinator:
   cpu: 100m
   memory: 128Mi
