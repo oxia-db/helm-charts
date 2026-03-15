@@ -30,6 +30,9 @@ spec:
       annotations:
         prometheus.io/port: "{{ include "oxia-cluster.port" .Values.server.config.observability.metric.bindAddress }}"
         prometheus.io/scrape: "{{ .Values.monitoringEnabled }}"
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels:
         oxia_cluster: {{ .Release.Name }}
         {{- include "oxia-cluster.server.labels" . | nindent 8 }}
@@ -38,6 +41,18 @@ spec:
       serviceAccountName: {{ .Release.Name }}
       securityContext:
         fsGroup: 10001
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - command:
             - "oxia"
@@ -49,6 +64,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: server
+          {{- with .Values.serverEnv }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -90,6 +109,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: coordinator
+          {{- with .Values.coordinatorEnv }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
