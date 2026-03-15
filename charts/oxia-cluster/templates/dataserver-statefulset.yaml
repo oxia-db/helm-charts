@@ -83,7 +83,7 @@ spec:
         - command:
             - "oxia"
             - "coordinator"
-            - "--sconfig=/oxia/conf/coordinator/config.yaml"
+            - "--sconfig=/oxia/conf/coordinator/coordinator.yaml"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
