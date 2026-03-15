@@ -42,7 +42,7 @@ spec:
         - command:
             - "oxia"
             - "server"
-            - "--sconfig=/oxia/conf/dataserver.yaml"
+            - "--sconfig=/oxia/conf/daemon/dataserver.yaml"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
@@ -60,7 +60,7 @@ spec:
             - containerPort: {{ include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress | int }}
               name: internal
             - containerPort: {{ include "oxia-cluster.port" .Values.server.config.observability.metric.bindAddress | int }}
-              name: metrics
+              name: ds-metrics
           resources:
             requests:
               cpu: {{ .Values.server.cpu }}
@@ -71,8 +71,8 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-            - name: server-config
-              mountPath: /oxia/conf
+            - name: daemon-config
+              mountPath: /oxia/conf/daemon
               readOnly: true
           livenessProbe:
             {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress) | nindent 12 }}
@@ -83,7 +83,7 @@ spec:
         - command:
             - "oxia"
             - "coordinator"
-            - "--sconfig=/oxia/conf/coordinator/coordinator.yaml"
+            - "--sconfig=/oxia/conf/daemon/coordinator.yaml"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
@@ -99,7 +99,7 @@ spec:
             - containerPort: {{ include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress | int }}
               name: coord-internal
             - containerPort: {{ include "oxia-cluster.port" .Values.coordinator.config.observability.metric.bindAddress | int }}
-              name: coord-metrics
+              name: co-metrics
           resources:
             requests:
               cpu: {{ .Values.coordinator.cpu }}
@@ -108,26 +108,23 @@ spec:
               cpu: {{ .Values.coordinator.cpu }}
               memory: {{ .Values.coordinator.memory }}
           volumeMounts:
+            - name: daemon-config
+              mountPath: /oxia/conf/daemon
+              readOnly: true
             - name: coordinator-config
               mountPath: /oxia/conf/coordinator
-              readOnly: true
-            - name: cluster-config
-              mountPath: /oxia/conf/cluster
               readOnly: true
           livenessProbe:
             {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress) | nindent 12 }}
           readinessProbe:
             {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress) | nindent 12 }}
       volumes:
-        - name: server-config
+        - name: daemon-config
           configMap:
-            name: {{ .Release.Name }}-server
+            name: {{ .Release.Name }}-daemon
         - name: coordinator-config
           configMap:
             name: {{ .Release.Name }}-coordinator
-        - name: cluster-config
-          configMap:
-            name: {{ .Release.Name }}-cluster
   volumeClaimTemplates:
     - metadata:
         name: data

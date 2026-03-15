@@ -17,7 +17,16 @@ kind: ConfigMap
 metadata:
   labels:
     {{- include "oxia-cluster.server.labels" . | nindent 4 }}
-  name: {{ .Release.Name }}-server
+  name: {{ .Release.Name }}-daemon
 data:
+  coordinator.yaml: |
+    cluster:
+      configPath: "/oxia/conf/coordinator/config.yaml"
+    metadata:
+      providerName: "configmap"
+      kubernetes:
+        namespace: {{ .Release.Namespace | quote }}
+        configMapName: {{ .Release.Name }}-status
+    {{- .Values.coordinator.config | toYaml | nindent 4 }}
   dataserver.yaml: |
     {{- .Values.server.config | toYaml | nindent 4 }}

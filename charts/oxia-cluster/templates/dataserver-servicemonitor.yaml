@@ -22,9 +22,9 @@ metadata:
 spec:
   endpoints:
     - path: "/metrics"
-      port: metrics
+      port: ds-metrics
     - path: "/metrics"
-      port: coord-metrics
+      port: co-metrics
   selector:
     matchLabels:
       {{- include "oxia-cluster.server.selectorLabels" . | nindent 6 }}
