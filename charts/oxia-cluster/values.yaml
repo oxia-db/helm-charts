@@ -95,3 +95,21 @@ image:
 
 pprofEnabled: false
 monitoringEnabled: false
+
+# Pod scheduling
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Additional pod annotations
+podAnnotations: {}
+
+## Additional environment variables
+# serverEnv:
+#   - name: MY_VAR
+#     value: "my-value"
+serverEnv: []
+# coordinatorEnv:
+#   - name: MY_VAR
+#     value: "my-value"
+coordinatorEnv: []
