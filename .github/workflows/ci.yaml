@@ -29,6 +29,10 @@ jobs:
             --set server.replicas=3 \
             --set initialShardCount=1 \
             --set replicationFactor=3 \
+            --set server.cpu=50m \
+            --set server.memory=128Mi \
+            --set coordinator.cpu=50m \
+            --set coordinator.memory=64Mi \
             --wait \
             --timeout 5m
       - name: Verify pods are running
