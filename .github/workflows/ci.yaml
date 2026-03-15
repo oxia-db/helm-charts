@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: Lint chart
+        run: helm lint charts/oxia-cluster
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+      - name: Install chart
+        run: |
+          helm install oxia charts/oxia-cluster \
+            --set server.replicas=3 \
+            --set initialShardCount=1 \
+            --set replicationFactor=3 \
+            --set server.cpu=50m \
+            --set server.memory=128Mi \
+            --set coordinator.cpu=50m \
+            --set coordinator.memory=64Mi \
+            --wait \
+            --timeout 5m
+      - name: Verify pods are running
+        run: kubectl get pods -l app.kubernetes.io/instance=oxia
+      - name: Wait for cluster to stabilize
+        run: sleep 15
+      - name: Run helm test
+        run: helm test oxia --timeout 3m
+      - name: Debug on failure
+        if: failure()
+        run: |
+          echo "=== Pods ==="
+          kubectl get pods -o wide
+          echo "=== Events ==="
+          kubectl get events --sort-by=.lastTimestamp
+          echo "=== Pod logs ==="
+          for pod in $(kubectl get pods -o name); do
+            echo "--- $pod ---"
+            kubectl logs "$pod" --all-containers --tail=50
+          done
