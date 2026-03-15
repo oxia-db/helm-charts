@@ -1,35 +1,23 @@
 # Oxia Helm Charts
 
-This repository contains the official Helm charts for deploying [Oxia](https://github.com/oxia-db/oxia), a distributed, embedded, and highly available database.
-
-## Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-* **Kubernetes cluster** 
-* **Helm**
+Official Helm charts for deploying [Oxia](https://github.com/oxia-db/oxia).
 
 ## Quick Start
 
-Follow these steps to add the Oxia Helm repository and install a release.
-
-1.  **Add the Helm repository:**
-
-    ```bash
-    helm repo add oxia https://oxia-db.github.io/helm-charts/
-    helm repo update
-    ```
-
-2.  **Install the chart:**
-
-    You can deploy Oxia with a simple `helm install` command. This will create a release named `my-release` in your current namespace.
-
-    ```bash
-    helm install my-release oxia/oxia-cluster
-    ```
+```bash
+helm repo add oxia https://oxia-db.github.io/helm-charts/
+helm repo update
+helm install my-oxia oxia/oxia-cluster
+```
 
 ## Configuration
 
-You can customize your deployment by using the `--set` flag or by providing a custom `values.yaml` file.
+See [`values.yaml`](charts/oxia-cluster/values.yaml) for all available options.
 
-To see all available configuration options, refer to the `values.yaml` file in the chart's repository.
+## Monitoring
+
+Grafana dashboards are available in the [oxia repository](https://github.com/oxia-db/oxia/tree/main/deploy/dashboards).
+
+## License
+
+Apache License 2.0
