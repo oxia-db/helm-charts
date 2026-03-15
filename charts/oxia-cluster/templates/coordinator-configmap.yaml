@@ -19,7 +19,7 @@ metadata:
     {{- include "oxia-cluster.coordinator.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-coordinator
 data:
-  coordinator.yaml: |
+  config.yaml: |
     cluster:
       configPath: "/oxia/conf/cluster/config.yaml"
     metadata:
