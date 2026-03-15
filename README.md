@@ -129,16 +129,6 @@ Each server pod runs two containers as sidecars:
 | `{release}-svc` | Headless service for StatefulSet DNS |
 | `{release}` | ClusterIP service for client access |
 
-## Upgrading
-
-### From 0.0.3
-
-- The coordinator has moved from a standalone Deployment to a sidecar container in the server StatefulSet
-- The `{release}-coordinator` ConfigMap now contains cluster topology with the `config.yaml` key (backward compatible)
-- A new `{release}-daemon` ConfigMap is introduced for service configurations
-- Port names for metrics changed: `metrics` → `ds-metrics`, `coord-metrics` → `co-metrics`
-- Server configuration is now YAML-based (`server.config`) instead of individual port values
-
 ## Development
 
 ### Running Tests
