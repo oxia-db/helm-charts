@@ -37,6 +37,8 @@ jobs:
             --timeout 5m
       - name: Verify pods are running
         run: kubectl get pods -l app.kubernetes.io/instance=oxia
+      - name: Wait for cluster to stabilize
+        run: sleep 15
       - name: Run helm test
         run: helm test oxia --timeout 3m
       - name: Debug on failure
@@ -47,7 +49,7 @@ jobs:
           echo "=== Events ==="
           kubectl get events --sort-by=.lastTimestamp
           echo "=== Pod logs ==="
-          for pod in $(kubectl get pods -l app.kubernetes.io/instance=oxia -o name); do
+          for pod in $(kubectl get pods -o name); do
             echo "--- $pod ---"
             kubectl logs "$pod" --all-containers --tail=50
           done
