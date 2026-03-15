@@ -27,14 +27,14 @@ spec:
     - name: internal
       port: {{ include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress | int }}
       targetPort: internal
-    - name: metrics
+    - name: ds-metrics
       port: {{ include "oxia-cluster.port" .Values.server.config.observability.metric.bindAddress | int }}
-      targetPort: metrics
+      targetPort: ds-metrics
     - name: coord-internal
       port: {{ include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress | int }}
       targetPort: coord-internal
-    - name: coord-metrics
+    - name: co-metrics
       port: {{ include "oxia-cluster.port" .Values.coordinator.config.observability.metric.bindAddress | int }}
-      targetPort: coord-metrics
+      targetPort: co-metrics
   selector:
     {{- include "oxia-cluster.server.selectorLabels" . | nindent 4 }}

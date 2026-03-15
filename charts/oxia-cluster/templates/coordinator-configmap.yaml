@@ -19,12 +19,24 @@ metadata:
     {{- include "oxia-cluster.coordinator.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-coordinator
 data:
-  coordinator.yaml: |
-    cluster:
-      configPath: "/oxia/conf/cluster/config.yaml"
-    metadata:
-      providerName: "configmap"
-      kubernetes:
-        namespace: {{ .Release.Namespace | quote }}
-        configMapName: {{ .Release.Name }}-status
-    {{- .Values.coordinator.config | toYaml | nindent 4 }}
+  config.yaml: |
+    namespaces:
+      {{- if .Values.namespaces }}
+      {{- range .Values.namespaces }}
+      - name: {{ .name }}
+        initialShardCount: {{ .initialShardCount }}
+        replicationFactor: {{ .replicationFactor }}
+      {{- end }}
+      {{- else }}
+      - name: default
+        initialShardCount: {{ .Values.initialShardCount }}
+        replicationFactor: {{ .Values.replicationFactor }}
+      {{- end }}
+    servers:
+      {{- $public := include "oxia-cluster.port" .Values.server.config.server.public.bindAddress }}
+      {{- $internal := include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress }}
+      {{- $vars := dict "name" .Release.Name "namespace" .Release.Namespace "public" $public "internal" $internal }}
+      {{- range until (int .Values.server.replicas) }}
+      - public: {{ $vars.name }}-{{ . }}.{{ $vars.name }}-svc.{{ $vars.namespace }}.svc.cluster.local:{{ $vars.public }}
+        internal: {{ $vars.name }}-{{ . }}.{{ $vars.name }}-svc:{{ $vars.internal }}
+      {{- end }}
