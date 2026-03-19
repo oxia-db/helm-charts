@@ -2,6 +2,11 @@
 
 Official Helm charts for deploying [Oxia](https://github.com/oxia-db/oxia).
 
+## Prerequisites
+
+- Chart version 0.0.4+ requires Oxia >= 0.16.1
+- For older Oxia versions, use chart version 0.0.3
+
 ## Quick Start
 
 ```bash
