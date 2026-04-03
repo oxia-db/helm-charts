@@ -67,7 +67,7 @@ spec:
         - command:
             - "oxia"
             - "server"
-            - "--sconfig=/oxia/conf/daemon/dataserver.yaml"
+            - "--sconfig=/oxia/conf/dataserver.yaml"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
@@ -101,7 +101,7 @@ spec:
             - name: data
               mountPath: /data
             - name: daemon-config
-              mountPath: /oxia/conf/daemon
+              mountPath: /oxia/conf
               readOnly: true
           livenessProbe:
             {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress) | nindent 12 }}
@@ -112,7 +112,7 @@ spec:
         - command:
             - "oxia"
             - "coordinator"
-            - "--sconfig=/oxia/conf/daemon/coordinator.yaml"
+            - "--sconfig=/oxia/conf/coordinator.yaml"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
@@ -142,7 +142,7 @@ spec:
               memory: {{ .Values.coordinator.memory }}
           volumeMounts:
             - name: daemon-config
-              mountPath: /oxia/conf/daemon
+              mountPath: /oxia/conf
               readOnly: true
             - name: coordinator-config
               mountPath: /oxia/conf/coordinator
