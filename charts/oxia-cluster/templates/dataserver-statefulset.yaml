@@ -113,6 +113,7 @@ spec:
             - "oxia"
             - "coordinator"
             - "--sconfig=/oxia/conf/coordinator.yaml"
+            - "--cconfig=configmap:{{ .Release.Namespace }}/{{ .Release.Name }}-coordinator"
             {{- if .Values.pprofEnabled }}
             - "--profile"
             {{- end}}
@@ -144,9 +145,6 @@ spec:
             - name: daemon-config
               mountPath: /oxia/conf
               readOnly: true
-            - name: coordinator-config
-              mountPath: /oxia/conf/coordinator
-              readOnly: true
           livenessProbe:
             {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress) | nindent 12 }}
           readinessProbe:
@@ -155,9 +153,6 @@ spec:
         - name: daemon-config
           configMap:
             name: {{ .Release.Name }}-daemon
-        - name: coordinator-config
-          configMap:
-            name: {{ .Release.Name }}-coordinator
   volumeClaimTemplates:
     - metadata:
         name: data
