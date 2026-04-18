@@ -40,3 +40,8 @@ data:
       - public: {{ $vars.name }}-{{ . }}.{{ $vars.name }}-svc.{{ $vars.namespace }}.svc.cluster.local:{{ $vars.public }}
         internal: {{ $vars.name }}-{{ . }}.{{ $vars.name }}-svc:{{ $vars.internal }}
       {{- end }}
+    allowExtraAuthorities:
+      - {{ include "oxia-cluster.bootstrapAuthority" . }}
+      {{- with .Values.allowExtraAuthorities }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}

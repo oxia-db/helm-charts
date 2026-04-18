@@ -18,6 +18,13 @@
 
 initialShardCount: 3
 replicationFactor: 3
+allowExtraAuthorities: []
+# Additional authorities advertised to clients in shard assignments.
+# The chart always includes the public bootstrap service authority by default.
+# Use this list to append external DNS names or load balancers in addition to it.
+# Example:
+# allowExtraAuthorities:
+#   - oxia.example.com:443
 
 # For multiple namespaces, use:
 # namespaces:
