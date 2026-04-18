@@ -57,6 +57,13 @@ Extract port number from bind address (e.g., "0.0.0.0:6648" -> "6648")
 {{- end -}}
 
 {{/*
+Default public bootstrap authority advertised to clients
+*/}}
+{{- define "oxia-cluster.bootstrapAuthority" -}}
+{{- printf "%s.%s.svc.cluster.local:%s" .Release.Name .Release.Namespace (include "oxia-cluster.port" .Values.server.config.server.public.bindAddress) -}}
+{{- end -}}
+
+{{/*
 Probe
 */}}
 {{- define "oxia-cluster.probe" -}}
@@ -86,4 +93,3 @@ exec:
 initialDelaySeconds: 60
 timeoutSeconds: 10
 {{- end }}
-
