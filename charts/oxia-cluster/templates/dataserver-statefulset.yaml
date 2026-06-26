@@ -116,6 +116,7 @@ spec:
             - "--cconfig=configmap:{{ .Release.Namespace }}/{{ .Release.Name }}-coordinator"
             {{- if .Values.pprofEnabled }}
             - "--profile"
+            - "--profile-bind-address=127.0.0.1:6061"
             {{- end}}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
