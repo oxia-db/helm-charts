@@ -57,6 +57,13 @@ server:
   memory: 1Gi
   storage: 8Gi
   #storageClassName: xxx
+  # Optionally give the WAL its own dedicated volume, mounted at the configured
+  # storage.wal.dir, so WAL fsyncs don't compete with database I/O for the same
+  # disk (and the WAL can use a different, e.g. faster, storage class).
+  # When unset, wal and database share the single "data" volume as before.
+  # wal:
+  #   storage: 8Gi
+  #   #storageClassName: xxx   # defaults to server.storageClassName
   config:
     server:
       public:

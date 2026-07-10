@@ -100,6 +100,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+            {{- with .Values.server.wal }}
+            - name: wal
+              mountPath: {{ $.Values.server.config.storage.wal.dir }}
+            {{- end }}
             - name: daemon-config
               mountPath: /oxia/conf
               readOnly: true
@@ -165,3 +169,15 @@ spec:
         resources:
           requests:
             storage: {{ .Values.server.storage }}
+    {{- with .Values.server.wal }}
+    - metadata:
+        name: wal
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        {{- if or .storageClassName $.Values.server.storageClassName }}
+        storageClassName: {{ .storageClassName | default $.Values.server.storageClassName }}
+        {{- end}}
+        resources:
+          requests:
+            storage: {{ .storage }}
+    {{- end }}
