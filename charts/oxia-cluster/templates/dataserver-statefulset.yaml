@@ -107,12 +107,38 @@ spec:
             - name: daemon-config
               mountPath: /oxia/conf
               readOnly: true
+            {{- if .Values.tls.secretName }}
+            - name: tls
+              mountPath: /etc/oxia/tls
+              readOnly: true
+            {{- end }}
+          {{- $probePort := include "oxia-cluster.server.probePort" . }}
+          {{- if $probePort }}
           livenessProbe:
-            {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress) | nindent 12 }}
+            {{- include "oxia-cluster.probe" $probePort | nindent 12 }}
           readinessProbe:
-            {{- include "oxia-cluster.readiness-probe" (include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress) | nindent 12 }}
+            {{- include "oxia-cluster.readiness-probe" $probePort | nindent 12 }}
           startupProbe:
-            {{- include "oxia-cluster.startup-probe" (include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress) | nindent 12 }}
+            {{- include "oxia-cluster.startup-probe" $probePort | nindent 12 }}
+          {{- else }}
+          # Both endpoints have TLS, which "oxia health" can't speak: check
+          # that the internal endpoint accepts connections instead
+          livenessProbe:
+            tcpSocket:
+              port: internal
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: internal
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: internal
+            initialDelaySeconds: 60
+            timeoutSeconds: 10
+          {{- end }}
         - command:
             - "oxia"
             - "coordinator"
@@ -150,6 +176,11 @@ spec:
             - name: daemon-config
               mountPath: /oxia/conf
               readOnly: true
+            {{- if .Values.tls.secretName }}
+            - name: tls
+              mountPath: /etc/oxia/tls
+              readOnly: true
+            {{- end }}
           livenessProbe:
             {{- include "oxia-cluster.probe" (include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress) | nindent 12 }}
           readinessProbe:
@@ -158,6 +189,11 @@ spec:
         - name: daemon-config
           configMap:
             name: {{ .Release.Name }}-daemon
+        {{- with .Values.tls.secretName }}
+        - name: tls
+          secret:
+            secretName: {{ . }}
+        {{- end }}
   volumeClaimTemplates:
     - metadata:
         name: data
