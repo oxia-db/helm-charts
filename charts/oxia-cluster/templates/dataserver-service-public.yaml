@@ -20,21 +20,11 @@ metadata:
     {{- include "oxia-cluster.server.labels" . | nindent 4 }}
   name: {{ .Release.Name }}
 spec:
+  # Clients only need the public endpoint. Peers, the coordinator and the
+  # ServiceMonitor use the headless <release>-svc Service for the other ports.
   ports:
     - name: public
       port: {{ include "oxia-cluster.port" .Values.server.config.server.public.bindAddress | int }}
       targetPort: public
-    - name: internal
-      port: {{ include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress | int }}
-      targetPort: internal
-    - name: ds-metrics
-      port: {{ include "oxia-cluster.port" .Values.server.config.observability.metric.bindAddress | int }}
-      targetPort: ds-metrics
-    - name: coord-internal
-      port: {{ include "oxia-cluster.port" .Values.coordinator.config.server.internal.bindAddress | int }}
-      targetPort: coord-internal
-    - name: co-metrics
-      port: {{ include "oxia-cluster.port" .Values.coordinator.config.observability.metric.bindAddress | int }}
-      targetPort: co-metrics
   selector:
     {{- include "oxia-cluster.server.selectorLabels" . | nindent 4 }}

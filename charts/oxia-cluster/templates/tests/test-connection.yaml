@@ -1,3 +1,5 @@
+{{- /* "oxia health" only speaks plaintext */}}
+{{- if not .Values.tls.public.enabled }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -17,3 +19,4 @@ spec:
     - name: oxia-health
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
       command: ["oxia", "health", "--port={{ include "oxia-cluster.port" .Values.server.config.server.public.bindAddress }}", "--host={{ .Release.Name }}"]
+{{- end }}
