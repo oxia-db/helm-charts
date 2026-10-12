@@ -70,20 +70,7 @@ server:
         bindAddress: "0.0.0.0:6648"
       internal:
         bindAddress: "0.0.0.0:6649"
-    # TLS can be configured directly under server endpoints:
-    #   public:
-    #     tls:
-    #       enabled: true
-    #       certFile: /etc/oxia/tls/tls.crt
-    #       keyFile: /etc/oxia/tls/tls.key
-    #       trustedCaFile: /etc/oxia/tls/ca.crt
-    # Replication TLS:
-    # replication:
-    #   tls:
-    #     enabled: true
-    #     certFile: /etc/oxia/tls/tls.crt
-    #     keyFile: /etc/oxia/tls/tls.key
-    #     trustedCaFile: /etc/oxia/tls/ca.crt
+    # For TLS, see the top-level "tls" section.
     storage:
       wal:
         dir: "/data/wal"
@@ -100,6 +87,65 @@ server:
         bindAddress: "0.0.0.0:8080"
       log:
         level: "info"
+
+# TLS for the data server endpoints. The certificates come from an existing
+# Secret, mounted read-only at /etc/oxia/tls in the server and coordinator
+# containers when secretName is set. The Secret holds tls.crt and tls.key, plus
+# ca.crt (the CA that signs the cluster's certificates) when internal TLS or
+# clientAuth is enabled. cert-manager Certificates write all three.
+# The certificate must be valid for the names that get dialed:
+#   public:   <release>.<namespace>.svc.cluster.local (bootstrap) and
+#             *.<release>-svc.<namespace>.svc.cluster.local (shard leaders)
+#   internal: *.<release>-svc
+# These settings are merged into the Oxia config. Other TLS options
+# (minVersion, cipherSuites, ...) can still be set under
+# server.config.server.{public,internal}.tls, server.config.replication.tls and
+# coordinator.config.controller.tls.
+# "oxia health" only speaks plaintext: with TLS on both endpoints the data
+# server probes fall back to TCP checks, and with public TLS "helm test" has
+# no test to run.
+tls:
+  secretName: ""
+  # Client endpoint (server.public, port 6648)
+  public:
+    enabled: false
+    # Require clients to present a certificate signed by ca.crt (mTLS)
+    clientAuth: false
+  # Data server internal endpoint (server.internal, port 6649). Enabling it
+  # also enables TLS on the connections to it: replication between data
+  # servers (replication.tls) and the coordinator (controller.tls). Both
+  # present tls.crt as their client certificate.
+  internal:
+    enabled: false
+    # Require a client certificate signed by ca.crt (mTLS), so that only
+    # holders of a cluster certificate can call the internal RPCs
+    clientAuth: false
+
+# NetworkPolicy for the data server pods, which also run the coordinator.
+# It needs a CNI plugin that enforces NetworkPolicy (e.g. Calico or Cilium).
+# Other CNI plugins accept the policy but do not enforce it.
+# NetworkPolicies are additive: if other policies already select these pods,
+# this one adds its allowed sources to theirs.
+# Each "from" is a list of NetworkPolicyPeer entries (podSelector,
+# namespaceSelector, ipBlock).
+networkPolicy:
+  enabled: true
+  # Client endpoint (6648). Empty: allowed from anywhere, since clients
+  # usually run in other namespaces.
+  public:
+    from: []
+  # Data server and coordinator metrics (8080, 8081). Empty: allowed from
+  # anywhere, so Prometheus can scrape them. To allow only Prometheus:
+  #   - namespaceSelector:
+  #       matchLabels:
+  #         kubernetes.io/metadata.name: monitoring
+  metrics:
+    from: []
+  # Data server internal (6649), coordinator internal (6650) and coordinator
+  # admin (6651). Always allowed from this release's own pods. Add other
+  # sources here, e.g. for admin tooling.
+  internal:
+    from: []
 
 image:
   repository: oxia/oxia

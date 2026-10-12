@@ -64,6 +64,76 @@ Default public bootstrap authority advertised to clients
 {{- end -}}
 
 {{/*
+Oxia TLS options (common/security/tls.go) for the certificate Secret mounted
+at /etc/oxia/tls. Takes a dict: "ca" trusts ca.crt, "clientAuth" requires
+client certificates.
+*/}}
+{{- define "oxia-cluster.tlsOptions" -}}
+enabled: true
+certFile: /etc/oxia/tls/tls.crt
+keyFile: /etc/oxia/tls/tls.key
+{{- if .ca }}
+trustedCaFile: /etc/oxia/tls/ca.crt
+{{- end }}
+{{- if .clientAuth }}
+clientAuth: true
+{{- end }}
+{{- end }}
+
+{{/*
+Data server config: server.config with the settings from .Values.tls merged
+in. Keys set explicitly in server.config take precedence.
+*/}}
+{{- define "oxia-cluster.server.config" -}}
+{{- $config := deepCopy .Values.server.config -}}
+{{- with .Values.tls.public }}
+{{- if .enabled }}
+{{- $_ := required "tls.secretName must be set when tls.public.enabled is true" $.Values.tls.secretName }}
+{{- $tls := include "oxia-cluster.tlsOptions" (dict "ca" .clientAuth "clientAuth" .clientAuth) | fromYaml }}
+{{- $_ := merge $config.server.public (dict "tls" $tls) }}
+{{- end }}
+{{- end }}
+{{- with .Values.tls.internal }}
+{{- if .enabled }}
+{{- $_ := required "tls.secretName must be set when tls.internal.enabled is true" $.Values.tls.secretName }}
+{{- $serverTls := include "oxia-cluster.tlsOptions" (dict "ca" true "clientAuth" .clientAuth) | fromYaml }}
+{{- $_ := merge $config.server.internal (dict "tls" $serverTls) }}
+{{- /* Leaders replicate to the followers' internal endpoint */}}
+{{- $clientTls := include "oxia-cluster.tlsOptions" (dict "ca" true) | fromYaml }}
+{{- $_ := set $config "replication" (merge (default (dict) $config.replication) (dict "tls" $clientTls)) }}
+{{- end }}
+{{- end }}
+{{- toYaml $config }}
+{{- end }}
+
+{{/*
+Coordinator config: coordinator.config with the settings from .Values.tls
+merged in. Keys set explicitly in coordinator.config take precedence.
+*/}}
+{{- define "oxia-cluster.coordinator.config" -}}
+{{- $config := deepCopy .Values.coordinator.config -}}
+{{- if .Values.tls.internal.enabled }}
+{{- /* The coordinator calls the data servers' internal endpoint */}}
+{{- $tls := include "oxia-cluster.tlsOptions" (dict "ca" true) | fromYaml }}
+{{- $_ := set $config "controller" (merge (default (dict) $config.controller) (dict "tls" $tls)) }}
+{{- end }}
+{{- toYaml $config }}
+{{- end }}
+
+{{/*
+Port for the data server probes. "oxia health" only speaks plaintext, so use
+the internal endpoint, or the public one when only the internal endpoint has
+TLS (both serve the same health service). Empty when both have TLS.
+*/}}
+{{- define "oxia-cluster.server.probePort" -}}
+{{- if not .Values.tls.internal.enabled -}}
+{{- include "oxia-cluster.port" .Values.server.config.server.internal.bindAddress -}}
+{{- else if not .Values.tls.public.enabled -}}
+{{- include "oxia-cluster.port" .Values.server.config.server.public.bindAddress -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Probe
 */}}
 {{- define "oxia-cluster.probe" -}}

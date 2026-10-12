@@ -25,6 +25,6 @@ data:
       kubernetes:
         namespace: {{ .Release.Namespace | quote }}
         configMapName: {{ .Release.Name }}-status
-    {{- .Values.coordinator.config | toYaml | nindent 4 }}
+    {{- include "oxia-cluster.coordinator.config" . | nindent 4 }}
   dataserver.yaml: |
-    {{- .Values.server.config | toYaml | nindent 4 }}
+    {{- include "oxia-cluster.server.config" . | nindent 4 }}
