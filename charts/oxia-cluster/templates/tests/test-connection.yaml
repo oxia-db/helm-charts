@@ -4,8 +4,13 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: {{ .Release.Name }}-test-connection
+  # Not the server labels: those would put this pod behind the Services and
+  # count it in the PodDisruptionBudget
   labels:
-    {{- include "oxia-cluster.server.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/component: test
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
     "helm.sh/hook": test
 spec:
