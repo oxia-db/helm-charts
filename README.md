@@ -1,4 +1,6 @@
 # Oxia Helm Charts
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Foxia-db%2Fhelm-charts.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Foxia-db%2Fhelm-charts?ref=badge_shield)
+
 
 Official Helm charts for deploying [Oxia](https://github.com/oxia-db/oxia).
 
@@ -26,3 +28,6 @@ Grafana dashboards are available in the [oxia repository](https://github.com/oxi
 ## License
 
 Apache License 2.0
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Foxia-db%2Fhelm-charts.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Foxia-db%2Fhelm-charts?ref=badge_large)
