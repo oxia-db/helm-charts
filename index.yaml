@@ -2,6 +2,23 @@ apiVersion: v1
 entries:
   oxia-cluster:
   - apiVersion: v2
+    appVersion: 0.18.0
+    created: "2026-10-26T17:12:00.370312385Z"
+    description: Oxia cluster
+    digest: 4aa9f176e0d980733deb5f50cf08c319928154af418938917884ec7eb3874222
+    home: https://oxia-db.github.io
+    icon: https://raw.githubusercontent.com/oxia-db/oxia/main/docs/oxia-logo.png
+    maintainers:
+    - email: support@streamnative.io
+      name: StreamNative Support
+    name: oxia-cluster
+    sources:
+    - https://github.com/oxia-db/oxia
+    type: application
+    urls:
+    - https://github.com/oxia-db/helm-charts/releases/download/oxia-cluster-0.0.9/oxia-cluster-0.0.9.tgz
+    version: 0.0.9
+  - apiVersion: v2
     appVersion: 1.16.0
     created: "2026-07-10T18:28:29.609577417Z"
     description: Oxia cluster
@@ -137,4 +154,4 @@ entries:
     urls:
     - https://github.com/oxia-db/helm-charts/releases/download/oxia-cluster-0.0.1/oxia-cluster-0.0.1.tgz
     version: 0.0.1
-generated: "2026-07-10T18:28:29.609619666Z"
+generated: "2026-10-26T17:12:00.370347408Z"
