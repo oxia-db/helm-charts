@@ -149,8 +149,11 @@ networkPolicy:
 
 image:
   repository: oxia/oxia
-  tag: latest
-  pullPolicy: Always
+  # Defaults to the chart's appVersion. Set a fixed Oxia version here rather
+  # than a moving tag such as "latest", so that a pod restart never upgrades
+  # the cluster.
+  tag: ""
+  pullPolicy: IfNotPresent
   #pullSecrets: xxx
 
 pprofEnabled: false
